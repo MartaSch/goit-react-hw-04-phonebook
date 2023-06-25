@@ -1,6 +1,6 @@
 import ContactForm from './ContactsForm/ContactsForm';
 import ContactList from './ContactList/ContactList';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { nanoid } from 'nanoid';
 import Filter from './Filter/Filter';
 
@@ -11,9 +11,22 @@ const initialContacts = [
   { id: 'id-4', name: 'Annie Copeland', number: '227-91-26' },
 ];
 
+const LOCAL_KEY = 'contactPhonebook';
+
 export default function App() {
-  const [contacts, setContacts] = useState(initialContacts);
   const [filter, setFilter] = useState('');
+
+  const [contacts, setContacts] = useState(() => {
+    const savedContacts = localStorage.getItem(LOCAL_KEY);
+    if (savedContacts !== null) {
+      const parsedContacts = JSON.parse(savedContacts);
+      return parsedContacts || initialContacts;
+    }
+  });
+
+  useEffect(() => {
+    localStorage.setItem(LOCAL_KEY, JSON.stringify(contacts));
+  }, [contacts]);
 
   const addContact = ({ id, name, number }) => {
     const contact = {
